@@ -1,0 +1,60 @@
+@import "theme";
+
+.texture-black {
+    background-image: url('/textures/black.jpg');
+
+    h2 {
+        color: #999;
+    }
+}
+
+.texture-blue {
+    background-image: url('/textures/blue.jpg');
+
+    h2 {
+        color: #ddd;
+    }
+
+    .social i:hover {
+        color: #eee;
+    }
+
+    .post-date {
+        color: #ccc;
+    }
+}
+
+.texture-red {
+    background-image: url('/textures/red.jpg');
+}
+
+.texture-purple {
+    background-image: url('/textures/purple.jpg');
+}
+
+.texture-green {
+    background-image: url('/textures/green.jpg');
+
+    .post-date {
+        color: #ccc;
+    }
+}
+
+.texture-red,
+.texture-purple {
+    h2 {
+        color: #ccc;
+    }
+
+    .social i {
+        color: #ddd;
+
+        &:hover {
+            color: lighten(#ddd, 7%);
+        }
+    }
+
+    .post-date {
+        color: #ddd;
+    }
+}
