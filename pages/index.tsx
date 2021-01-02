@@ -1,29 +1,20 @@
 import fs from "fs";
-import matter from "gray-matter";
 import { GetStaticProps } from "next";
 import yaml from "js-yaml";
 import Link from "next/link";
 import Head from "next/head";
 import Analytics from "../lib/analytics";
 import ReactMarkdown from "react-markdown";
+import { getAllPosts } from "@util";
+import Header from "@includes/header";
 
-export default function Home({ contents, config }) {
-  let datas: matter.GrayMatterFile<any>[] = [];
-  for (let content of contents) {
-    const data = matter(content);
-    datas.push(data);
-  }
-  datas = datas.sort(date_descending);
+export default function Home({ posts, config }) {
+  posts = posts.sort(date_descending);
   return (
     <>
       <Head>
         <Analytics config={config} />
-        <title>{config.title}</title>
-        <meta property="og:title" content={config.title} />
-        <meta name="description" content={config.description} />
-        <meta property="og:description" content={config.description} />
-        <meta name="twitter:card" content="summary" />
-        <meta property="twitter:title" content={config.title} />
+        <Header title={config.title} description={config.description} />
       </Head>
       <header className="texture-black">
         <div className="container">
@@ -66,13 +57,13 @@ export default function Home({ contents, config }) {
       <main>
         <div className="container">
           <ul className="posts">
-            {datas.map((data, key) => {
-              const time = new Date(data.data.date);
+            {posts.map((post, key) => {
+              const time = new Date(post.date);
               return (
                 <li key={key}>
                   <div className="post-meta">
-                    <Link href={`/posts/${data.data.name}/`}>
-                      <h2 className="post-title">{data.data.title}</h2>
+                    <Link href={`/posts/${post.slug}/`}>
+                      <h2 className="post-title">{post.title}</h2>
                     </Link>
                     <div className="post-date">
                       <i className="icon-calendar"></i>
@@ -81,7 +72,7 @@ export default function Home({ contents, config }) {
                     </div>
                   </div>
                   <div className="post">
-                    <ReactMarkdown children={data.data.description} />
+                    <ReactMarkdown children={post.description} />
                   </div>
                 </li>
               );
@@ -94,22 +85,17 @@ export default function Home({ contents, config }) {
 }
 
 function date_descending(a, b) {
-  var dateA = new Date(a.data.date).getTime();
-  var dateB = new Date(b.data.date).getTime();
+  var dateA = new Date(a.date).getTime();
+  var dateB = new Date(b.date).getTime();
   return dateA < dateB ? 1 : -1;
 };
 
 export const getStaticProps: GetStaticProps = async context => {
   const config = yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"), "utf8");
-  const files: string[] = await fs.readdirSync("./content", "utf8");
-  let contents: Object[] = [];
-  for (let file of files) {
-    const content = await import(`../content/${file}`);
-    contents.push(content.default);
-  }
+  const allPosts = await getAllPosts()
   return {
     props: {
-      contents,
+      posts: allPosts,
       config,
     },
   };

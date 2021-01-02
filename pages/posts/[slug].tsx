@@ -1,30 +1,20 @@
 import ReactMarkdown from "react-markdown";
-import matter from "gray-matter";
 import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import Head from "next/head";
 import yaml from "js-yaml";
 import fs from "fs";
 import Analytics from "../../lib/analytics";
+import { getPostBySlug , getAllPosts } from "@util";
+import Header from "@includes/header";
 
-export default function PostTemplate({ data, config }) {
-  const frontmatter = data.data;
-  const content = data.content;
-
-  const time = new Date(frontmatter.date);
-
-  const categories = frontmatter.categories.split(" ");
-
+export default function PostTemplate({ post, config }) {
+  const time = new Date(post.date);
   return (
     <>
       <Head>
         <Analytics config={config} />
-        <title>{frontmatter.title}</title>
-        <meta property="og:title" content={frontmatter.title} />
-        <meta name="description" content={categories.join(" ")} />
-        <meta property="og:description" content={categories.join(" ")} />
-        <meta name="twitter:card" content="summary" />
-        <meta property="twitter:title" content={frontmatter.title} />
+        <Header title={post.title} description={post.categories.join(" ")} />
       </Head>
       <header className="texture-black">
         <div className="container">
@@ -37,13 +27,13 @@ export default function PostTemplate({ data, config }) {
           </div>
         </div>
         <div className="container">
-          <h1>{frontmatter.title}</h1>
+          <h1>{post.title}</h1>
           <h4 className="post-description"></h4>
           <div className="post-date" style={{ marginTop: "20px" }}>
             {time.getFullYear()}년 {time.getMonth() + 1}월 {time.getDate()}일
           </div>
           <ul className="post-tags">
-            {categories.map((category, key) => (
+            {post.categories.map((category, key) => (
               <li key={key}>{category}</li>
             ))}
           </ul>
@@ -52,7 +42,7 @@ export default function PostTemplate({ data, config }) {
       <main>
         <div className="container">
           <div className="post-container">
-            <ReactMarkdown children={content} renderers={renderers} />
+            <ReactMarkdown children={post.content} renderers={renderers} />
           </div>
         </div>
       </main>
@@ -75,10 +65,9 @@ const renderers = {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  const files: string[] = await fs.readdirSync("./content", "utf8");
-
-  const paths = files.map(post => ({
-    params: { slug: post.split(".md")[0] },
+  let paths = await getAllPosts()
+  paths = paths.map(post => ({
+    params: { slug: post.slug },
   }));
   return {
     paths,
@@ -91,14 +80,10 @@ export const getStaticProps: GetStaticProps = async context => {
     fs.readFileSync("./config.yml", "utf8"),
     "utf8"
   );
-  const { slug } = context.params;
-  const content = await import(`../../content/${slug}.md`);
-  const data = matter(content.default);
-  data.data.date = String(data.data.date);
-  data.orig = null;
+  const post = await getPostBySlug(context.params.slug)
   return {
     props: {
-      data,
+      post,
       config,
     },
   };

@@ -1,6 +1,5 @@
 ---
 title: "javascript로 디스코드 봇만들기 1화"
-name: "awesome-nextjs-blog"
 description: "기초작업 하기"
 date: 2020-12-30T10:53:00+09:00
 categories: NodeJS DiscordJS javascript
@@ -56,10 +55,6 @@ client.on('message', message => {
 });
 
 client.login('token');
-```
-
-```py
-print("")
 ```
 token에는 아까 만든 못의 토큰을 넣어주세요.
 

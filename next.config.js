@@ -9,6 +9,10 @@ module.exports = {
       test: /\.md$/,
       use: "raw-loader",
     });
+    config.module.rules.push({
+      test: /\.yml$/,
+      use: "js-yaml-loader",
+    })
     return config;
   },
 };
