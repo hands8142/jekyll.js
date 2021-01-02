@@ -1,8 +1,11 @@
 import fs from "fs";
 import matter from "gray-matter";
 import { GetStaticProps } from "next";
+import yaml from "js-yaml";
+import Link from "next/link";
+import Head from "next/head";
 
-export default function Home({ contents }) {
+export default function Home({ contents, config }) {
   let datas: matter.GrayMatterFile<any>[] = [];
   for (let content of contents) {
     const data = matter(content);
@@ -10,25 +13,49 @@ export default function Home({ contents }) {
   }
   return (
     <>
+      <Head>
+        <title>{config.title}</title>
+        <meta property="og:title" content={config.title} />
+        <meta name="description" content={config.description} />
+        <meta property="og:description" content={config.description} />
+        <meta name="twitter:card" content="summary" />
+        <meta property="twitter:title" content={config.title} />
+      </Head>
       <header className="texture-black">
         <div className="container">
           <div className="navbar">
             <ul>
-              <a href="/">
+              <Link href="/">
                 <li className="active">HOME</li>
-              </a>
+              </Link>
             </ul>
           </div>
         </div>
         <div className="container">
-          <h1>한동수</h1>
-          <h2>Developer</h2>
+          <h1>{config.title}</h1>
+          <h2>{config.tagline}</h2>
           <ul className="social">
-            <a href="https://github.com/hands8142">
-              <li>
-                <i className="icon-github-circled"></i>
-              </li>
-            </a>
+            {config.social_links.github ? (
+              <a href={`https://github.com/${config.social_links.github}`}>
+                <li>
+                  <i className="icon-github-circled"></i>
+                </li>
+              </a>
+            ) : null}
+            {config.social_links.linkedIn ? (
+              <a href={`https://linkedin.com/${config.social_links.linkedIn}`}>
+                <li>
+                  <i className="icon-linkedin-squared"></i>
+                </li>
+              </a>
+            ) : null}
+            {config.social_links.twitter ? (
+              <a href={`https://twitter.com/${config.social_links.twitter}`}>
+                <li>
+                  <i className="icon-twitter-squared"></i>
+                </li>
+              </a>
+            ) : null}
           </ul>
         </div>
       </header>
@@ -40,9 +67,9 @@ export default function Home({ contents }) {
               return (
                 <li key={key}>
                   <div className="post-meta">
-                    <a className="post-link" href={`/posts/${data.data.name}/`}>
+                    <Link href={`/posts/${data.data.name}/`}>
                       <h2 className="post-title">{data.data.title}</h2>
-                    </a>
+                    </Link>
                     <div className="post-date">
                       <i className="icon-calendar"></i>
                       {time.getFullYear()}년 {time.getMonth() + 1}월{" "}
@@ -63,6 +90,7 @@ export default function Home({ contents }) {
 }
 
 export const getStaticProps: GetStaticProps = async context => {
+  const config = yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"), "utf8");
   const files: string[] = await fs.readdirSync("./content", "utf8");
   let contents: Object[] = [];
   for (let file of files) {
@@ -72,6 +100,7 @@ export const getStaticProps: GetStaticProps = async context => {
   return {
     props: {
       contents,
+      config,
     },
   };
 };
