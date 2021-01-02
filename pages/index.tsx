@@ -4,6 +4,8 @@ import { GetStaticProps } from "next";
 import yaml from "js-yaml";
 import Link from "next/link";
 import Head from "next/head";
+import Analytics from "../lib/analytics";
+import ReactMarkdown from "react-markdown";
 
 export default function Home({ contents, config }) {
   let datas: matter.GrayMatterFile<any>[] = [];
@@ -11,9 +13,11 @@ export default function Home({ contents, config }) {
     const data = matter(content);
     datas.push(data);
   }
+  datas = datas.sort(date_descending);
   return (
     <>
       <Head>
+        <Analytics config={config} />
         <title>{config.title}</title>
         <meta property="og:title" content={config.title} />
         <meta name="description" content={config.description} />
@@ -77,7 +81,7 @@ export default function Home({ contents, config }) {
                     </div>
                   </div>
                   <div className="post">
-                    <p>{data.data.description}</p>
+                    <ReactMarkdown children={data.data.description} />
                   </div>
                 </li>
               );
@@ -88,6 +92,12 @@ export default function Home({ contents, config }) {
     </>
   );
 }
+
+function date_descending(a, b) {
+  var dateA = new Date(a.data.date).getTime();
+  var dateB = new Date(b.data.date).getTime();
+  return dateA < dateB ? 1 : -1;
+};
 
 export const getStaticProps: GetStaticProps = async context => {
   const config = yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"), "utf8");

@@ -1,12 +1,15 @@
 import ReactMarkdown from "react-markdown";
 import matter from "gray-matter";
-import { GetServerSideProps } from "next";
+import { GetStaticPaths, GetStaticProps } from "next";
 import Link from "next/link";
 import Head from "next/head";
+import yaml from "js-yaml";
+import fs from "fs";
+import Analytics from "../../lib/analytics";
 
 export default function PostTemplate({ data, config }) {
   const frontmatter = data.data;
-  const content = data.content
+  const content = data.content;
 
   const time = new Date(frontmatter.date);
 
@@ -14,14 +17,15 @@ export default function PostTemplate({ data, config }) {
 
   return (
     <>
-    <Head>
-      <title>{frontmatter.title}</title>
-      <meta property="og:title" content={frontmatter.title} />
-      <meta name="description" content={categories.join(" ")} />
-      <meta property="og:description" content={categories.join(" ")} />
-      <meta name="twitter:card" content="summary" />
-      <meta property="twitter:title" content={frontmatter.title} />
-    </Head>
+      <Head>
+        <Analytics config={config} />
+        <title>{frontmatter.title}</title>
+        <meta property="og:title" content={frontmatter.title} />
+        <meta name="description" content={categories.join(" ")} />
+        <meta property="og:description" content={categories.join(" ")} />
+        <meta name="twitter:card" content="summary" />
+        <meta property="twitter:title" content={frontmatter.title} />
+      </Head>
       <header className="texture-black">
         <div className="container">
           <div className="navbar">
@@ -70,15 +74,32 @@ const renderers = {
   },
 };
 
-export const getServerSideProps: GetServerSideProps = async context => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const files: string[] = await fs.readdirSync("./content", "utf8");
+
+  const paths = files.map(post => ({
+    params: { slug: post.split(".md")[0] },
+  }));
+  return {
+    paths,
+    fallback: false,
+  };
+};
+
+export const getStaticProps: GetStaticProps = async context => {
+  const config = yaml.safeLoad(
+    fs.readFileSync("./config.yml", "utf8"),
+    "utf8"
+  );
   const { slug } = context.params;
   const content = await import(`../../content/${slug}.md`);
   const data = matter(content.default);
-  data.data.date = String(data.data.date)
-  data.orig = null
+  data.data.date = String(data.data.date);
+  data.orig = null;
   return {
     props: {
       data,
+      config,
     },
   };
 };
