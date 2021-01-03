@@ -7,7 +7,7 @@ import Analytics from "../lib/analytics";
 import ReactMarkdown from "react-markdown";
 import { getAllPosts } from "@util";
 import Header from "@includes/header";
-import PageHeader from "@includes/page_heder";
+import PageHeader from "@includes/page_header";
 
 export default function Home({ posts, config }) {
   return (
