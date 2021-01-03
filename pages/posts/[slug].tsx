@@ -1,44 +1,21 @@
 import ReactMarkdown from "react-markdown";
 import { GetStaticPaths, GetStaticProps } from "next";
-import Link from "next/link";
 import Head from "next/head";
 import yaml from "js-yaml";
 import fs from "fs";
 import Analytics from "../../lib/analytics";
 import { getPostBySlug , getAllPosts } from "@util";
 import Header from "@includes/header";
+import PostHeader from "@includes/post_header";
 
 export default function PostTemplate({ post, config }) {
-  const time = new Date(post.date);
   return (
     <>
       <Head>
         <Analytics config={config} />
         <Header title={post.title} description={post.categories.join(" ")} />
       </Head>
-      <header className="texture-black">
-        <div className="container">
-          <div className="navbar">
-            <ul>
-              <Link href="/">
-                <li>HOME</li>
-              </Link>
-            </ul>
-          </div>
-        </div>
-        <div className="container">
-          <h1>{post.title}</h1>
-          <h4 className="post-description"></h4>
-          <div className="post-date" style={{ marginTop: "20px" }}>
-            {time.getFullYear()}년 {time.getMonth() + 1}월 {time.getDate()}일
-          </div>
-          <ul className="post-tags">
-            {post.categories.map((category, key) => (
-              <li key={key}>{category}</li>
-            ))}
-          </ul>
-        </div>
-      </header>
+      <PostHeader post={post} />
       <main>
         <div className="container">
           <div className="post-container">
