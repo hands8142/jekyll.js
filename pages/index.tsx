@@ -2,8 +2,7 @@ import fs from "fs";
 import { GetStaticProps } from "next";
 import yaml from "js-yaml";
 import Link from "next/link";
-import Head from "next/head";
-import Analytics from "../lib/analytics";
+import Analytics from "@includes/analytics";
 import ReactMarkdown from "react-markdown";
 import { getAllPosts } from "@util";
 import Header from "@includes/header";
@@ -12,10 +11,8 @@ import PageHeader from "@includes/page_header";
 export default function Home({ posts, config }) {
   return (
     <>
-      <Head>
-        <Analytics config={config} />
-        <Header title={config.title} description={config.description} />
-      </Head>
+      <Analytics config={config} />
+      <Header title={config.title} description={config.description} />
       <PageHeader config={config} />
       <main>
         <div className="container">
@@ -51,11 +48,11 @@ function date_descending(a, b) {
   var dateA = new Date(a.date).getTime();
   var dateB = new Date(b.date).getTime();
   return dateA < dateB ? 1 : -1;
-};
+}
 
 export const getStaticProps: GetStaticProps = async context => {
   const config = yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"), "utf8");
-  let posts = await getAllPosts()
+  let posts = await getAllPosts();
   posts = posts.sort(date_descending);
   return {
     props: {

@@ -1,20 +1,17 @@
 import ReactMarkdown from "react-markdown";
 import { GetStaticPaths, GetStaticProps } from "next";
-import Head from "next/head";
 import yaml from "js-yaml";
 import fs from "fs";
-import Analytics from "../../lib/analytics";
-import { getPostBySlug , getAllPosts } from "@util";
+import Analytics from "@includes/analytics";
+import { getPostBySlug, getAllPosts } from "@util";
 import Header from "@includes/header";
 import PostHeader from "@includes/post_header";
 
 export default function PostTemplate({ post, config }) {
   return (
     <>
-      <Head>
-        <Analytics config={config} />
-        <Header title={post.title} description={post.categories.join(" ")} />
-      </Head>
+      <Analytics config={config} />
+      <Header title={post.title} description={post.categories.join(" ")} />
       <PostHeader post={post} />
       <main>
         <div className="container">
@@ -42,7 +39,7 @@ const renderers = {
 };
 
 export const getStaticPaths: GetStaticPaths = async () => {
-  let paths = await getAllPosts()
+  let paths = await getAllPosts();
   paths = paths.map(post => ({
     params: { slug: post.slug },
   }));
@@ -53,11 +50,8 @@ export const getStaticPaths: GetStaticPaths = async () => {
 };
 
 export const getStaticProps: GetStaticProps = async context => {
-  const config = yaml.safeLoad(
-    fs.readFileSync("./config.yml", "utf8"),
-    "utf8"
-  );
-  const post = await getPostBySlug(context.params.slug)
+  const config = yaml.safeLoad(fs.readFileSync("./config.yml", "utf8"), "utf8");
+  const post = await getPostBySlug(context.params.slug);
   return {
     props: {
       post,
