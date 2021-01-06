@@ -7,6 +7,8 @@ description: > # this means to ignore newlines until "show_exerpts:"
   line in _config.yml. It will appear in your document head meta (for
   Google search results) and in your feed.xml site description.
 # analytics_id: 
+baseUrl: https://example.com
+# disqus_shortname: 
 social_links:
   github: hands8142
   twitter: hands8142
